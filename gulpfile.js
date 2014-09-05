@@ -5,6 +5,7 @@ var gulp        = require('gulp')
 , runSequence = require('run-sequence')
 , clean = require('gulp-clean')
 , gutil = require('gulp-util')
+ , shell = require('gulp-shell')
 , plumber = require('gulp-plumber')
 , config = {
     clean: ['dist'],
@@ -17,25 +18,36 @@ var gulp        = require('gulp')
         dest: 'dist',
         docgen: 'MODULE.md',
         options: {
-            main: 'Test.Main',
-            output: 'Main.js'
+            main: 'Helper',
+            output: 'dist/Main.js'
         }
     }
+};
+
+var paths = {
+    src: [
+        'src/**/*.purs',
+        'bower_components/purescript-*/src/**/*.purs'
+    ],
+    dest: '.'
 }
-;
 // https://github.com/purescript-contrib/purescript-contravariant/blob/master/gulpfile.js
 // https://github.com/purescript-contrib/purescript-free/blob/master/gulpfile.js
+
+var onError = function (err) {
+  gutil.beep();
+  console.log(err.message);
+};
 
 var compile = function(paths, options) {
     return function() {
         // We need this hack for now until gulp does something about
         // https://github.com/gulpjs/gulp/issues/71
         var psc = purescript.psc(options);
-        psc.on('error', function(e) {
-            console.error(e.message);
-            psc.end();
-        });
         return gulp.src(paths.src)
+            .pipe(plumber({
+              errorHandler: onError
+            }))
             .pipe(psc)
             .pipe(gulp.dest(paths.dest || 'js'));
     };
@@ -49,24 +61,45 @@ function docs (target) {
     }
 }
 
-gulp.task('make', function() {
-    return compile(purescript.pscMake);
-});
+gulp.task('run', ['browser'], function () {
+    gulp.src('')
+    .pipe(plumber({
+      errorHandler: onError
+    }))
+    .pipe(shell('node dist/Main.js'))
+    .on('finish', function () {
+      console.log('Done.');
+    })
+})
 
-gulp.task('browser', function() {
-    return compile(purescript.src, purescript.options);
+gulp.task('clean', function(){
+  return (
+    gulp.src(config.clean, {read: false}).
+      pipe(clean())
+  );
 });
+gulp.task('make', compile(purescript.pscMake));
+
+gulp.task('browser', compile(paths, config.purescript.options));
 
 // gulp.task('docs-Data.Contravariant', docs('Data.Contravariant'));
 
 // gulp.task('docs', ['docs-Data.Contravariant']);
 
+gulp.task('watch-run', function() {
+    gulp.watch(paths.src, function() {runSequence('clean', 'browser', 'run')});
+});
+
 gulp.task('watch-browser', function() {
     gulp.watch(paths.src, function() {runSequence('browser', 'docs')});
 });
-
 gulp.task('watch-make', function() {
     gulp.watch(paths.src, function() {runSequence('make', 'docs')});
 });
 
-gulp.task('default', function() {runSequence('make', 'docs')});
+// gulp.task('default', function() {runSequence('make', 'docs')});
+// gulp.task('default', ['clean', 'browser', 'run']);
+gulp.task('default', function() {
+    gulp.watch(paths.src, ['clean', 'run']);
+    // gulp.watch(paths.src, ['clean', 'browser', 'run']);
+});
