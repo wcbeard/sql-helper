@@ -1,9 +1,10 @@
 module Helper where
 
-import Data.Array hiding ((..))
+import qualified Data.Array as A
 import Data.Maybe
 import Data.String (split)
 import Control.Lens hiding ((??), (..))
+import qualified Data.Map as M
 -- import Control.Lens hiding ((??))
 
 import Debug.Trace
@@ -16,7 +17,7 @@ infixl 1 ??
 -- parietal = ()
 
 clean :: String -> String
-clean = fromMaybe "" .. last .. split "."
+clean = fromMaybe "" .. A.last .. split "."
 
 toFloat :: String -> String
 toFloat s = "CAST (" ++ s ++ " AS FLOAT) AS " ++ clean s
@@ -36,6 +37,12 @@ _col f (Col crec) = Col <$> f crec
 _floats :: forall a r. LensP {floats :: a | r} a
 _floats = lens (\o -> o.floats) (\o x -> o{floats = x})
 
+_columns :: forall a r. LensP {columns :: a | r} a
+_columns = lens (\o -> o.columns) (\o x -> o{columns = x})
+
+lst = ["foo" ~ ["elem1", "e2", "e3"], "bar" ~ ["e1", "e2", "e3"]]
+lst' = M.fromList lst
+
 o :: Col
 o = Col {floats: ["sales", "numbers", "other_numbers"],
          columns: ["names", "other_names"]}
@@ -44,29 +51,6 @@ instance showColRec :: Show Col where
   show (Col c) = "Col {names: " ++ (show c.floats) ++ "}"
 
 ff = ((++) ["new item"])
--- z = _col .. _floats
-
-type Foo =
-  { foo :: {bar :: Number}
-  , baz :: Boolean
-  }
-
-foo :: forall a b r. Lens {foo :: a | r} {foo :: b | r} a b
-foo = lens (\o -> o.foo) (\o x -> o{foo = x})
-foo' :: forall a b r. Lens {foo :: a | r} {foo :: b | r} a b
-foo' = foo
-bar :: forall a b r. Lens {bar :: a | r} {bar :: b | r} a b
-bar = lens (\o -> o.bar) (\o x -> o{bar = x})
-baz :: forall a b r. Lens {baz :: a | r} {baz :: b | r} a b
-baz = lens (\o -> o.baz) (\o x -> o{baz = x})
-
-fooBar :: forall a b r r'. Lens {foo :: {bar :: a | r} | r'} {foo :: {bar :: b | r} | r'} a b
-fooBar = foo..bar
-
-obj :: Foo
-obj = {foo: {bar: 0}, baz: true}
-
-succ x = x + 1
 
 foreign import showFooImpl
   "function showFooImpl(foo) {\
@@ -87,19 +71,7 @@ main = do
     -- let x = o ^. _col ^. _floats
     let x = o ^. _col ^. _floats
     print x
-    print $ Col .. over _floats ff $ c
-    print $ Col .. (_floats %~ ff) $ c
-    -- print' $ (_floats %~ ff) $ c
     print' $ _col .. _floats %~ ff $ o
-    -- print $ Col .. _floats %~ ff $ (o ^. _col)
-    -- print $ Col .. _floats %~ ff .. _col $ o
-    -- trace $ showFooImpl $ (foo' .. bar) .~ 10 $ obj
-    -- trace $ showFooImpl $ foo' .. (bar .~ 10) $ obj
-    -- trace $ show (foo' .. bar)
-    -- let x = over _floats ff c
-
-    -- print $ Col x
-    -- print $ over (++ ["new item"])
-
--- (indent-for-tab-command)
--- purescript-mode-suggest-indent-choice
+    print $ M.lookup "foo" lst' ?? []
+    trace $ M.showTree lst'
+    trace $ M.showTree $ M.map (A.map $ prefix "S") lst'
