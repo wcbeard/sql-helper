@@ -18,9 +18,15 @@ var gulp        = require('gulp')
         dest: 'dist',
         docgen: 'MODULE.md',
         options: {
-            main: 'Helper',
+            main: 'Helper.Angular.Main',
+            // modules: 'Helper.Angular.Main',
             output: 'dist/Main.js'
-        }
+        },
+        core: {options: {
+                    main: 'Helper',
+                    // modules: 'Helper.Angular.Main',
+                    output: 'dist/Core.js'
+                }}
     }
 };
 
@@ -61,12 +67,13 @@ function docs (target) {
     }
 }
 
-gulp.task('run', ['browser'], function () {
+gulp.task('run', ['core'], function () {
     gulp.src('')
     .pipe(plumber({
       errorHandler: onError
     }))
-    .pipe(shell('node dist/Main.js'))
+    .pipe(shell('node dist/Core.js'))
+    // .pipe(shell('node dist/Main.js'))
     .on('finish', function () {
       console.log('Done.');
     })
@@ -81,6 +88,7 @@ gulp.task('clean', function(){
 gulp.task('make', compile(purescript.pscMake));
 
 gulp.task('browser', compile(paths, config.purescript.options));
+gulp.task('core', compile(paths, config.purescript.core.options));
 
 // gulp.task('docs-Data.Contravariant', docs('Data.Contravariant'));
 
@@ -91,8 +99,15 @@ gulp.task('watch-run', function() {
 });
 
 gulp.task('watch-browser', function() {
-    gulp.watch(paths.src, function() {runSequence('browser', 'docs')});
+    gulp.watch(paths.src, function() {runSequence('clean', 'browser')});
+    // gulp.watch(paths.src, ['browser']);
+    // gulp.watch(paths.src, function() {runSequence('browser', 'docs')});
 });
+
+gulp.task('watch-core', function() {
+    gulp.watch(paths.src, function() {runSequence('core', 'run')});
+});
+
 gulp.task('watch-make', function() {
     gulp.watch(paths.src, function() {runSequence('make', 'docs')});
 });

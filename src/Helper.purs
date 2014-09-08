@@ -1,20 +1,25 @@
 module Helper where
 
+
+import qualified HRec as H
 import qualified Data.Array as A
 import Data.Maybe
 import Data.String (split)
-import Control.Lens hiding ((??), (..))
+-- import Control.Lens hiding ((??), (..))
 import qualified Data.Map as M
+import Data.Monoid (Monoid, mempty)
 -- import Control.Lens hiding ((??))
-
+import Data.Tuple (Tuple(..))
 import Debug.Trace
 
 columns = ["sales", "name"]
 infixr 9 ..
 infixl 1 ??
+infixr 6 ~
 (..) = (<<<)
 (??) = flip fromMaybe
--- parietal = ()
+(~) :: forall a b. a -> b -> Tuple a b
+(~) = Tuple
 
 clean :: String -> String
 clean = fromMaybe "" .. A.last .. split "."
@@ -30,15 +35,6 @@ prefix s = ((++) (s ++ "."))
 
 newtype Col = Col ColRec
 type ColRec = {floats :: [String], columns :: [String]}
-
-_col :: LensP Col ColRec
-_col f (Col crec) = Col <$> f crec
-
-_floats :: forall a r. LensP {floats :: a | r} a
-_floats = lens (\o -> o.floats) (\o x -> o{floats = x})
-
-_columns :: forall a r. LensP {columns :: a | r} a
-_columns = lens (\o -> o.columns) (\o x -> o{columns = x})
 
 lst = ["foo" ~ ["elem1", "e2", "e3"], "bar" ~ ["e1", "e2", "e3"]]
 lst' = M.fromList lst
@@ -59,6 +55,13 @@ foreign import showFooImpl
 
 print' = trace .. showFooImpl
 
+-- modify :: forall k v . M.Map k v -> k -> (v -> v) -> M.Map k v
+-- modify m k f = w
+--     where v = M.lookup k m ?? mempty
+
+h :: H.HRec [String]
+h = H.insert "floats" [] H.empty
+
 main = do
     trace "hello world!"
     print $ clean "hello. They are"
@@ -66,12 +69,10 @@ main = do
     print $ ((++) "S") "database.sales"
     print $ prefix "P" "database.sales"
     print $ o
-    -- let c = _col ^. o
-    let c = o ^. _col
-    -- let x = o ^. _col ^. _floats
-    let x = o ^. _col ^. _floats
-    print x
-    print' $ _col .. _floats %~ ff $ o
+
+    let x = A.map (prefix "S") <$> H.fromList [Tuple "floats" ["sales", "numbers"]]
+    trace $ showFooImpl x
+    -- trace $ showFooImpl $
     print $ M.lookup "foo" lst' ?? []
     trace $ M.showTree lst'
     trace $ M.showTree $ M.map (A.map $ prefix "S") lst'

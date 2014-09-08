@@ -12,14 +12,15 @@
   ],
   "dependencies": {
     "purescript-arrays": "*",
-    "purescript-maybe": "*",
-    "purescript-foldable-traversable": "*",
+    "purescript-maybe": "purescript/purescript-maybe#master",
     "purescript-strings": "~0.2.1",
-    "purescript-lens": "~0.1.3",
-    "purescript-maps": "~0.0.4"
+    "purescript-maps": "~0.0.4",
+    "purescript-monoid": "~0.1.4",
+    "purescript-angular": "purescript-contrib/purescript-angular#master",
+    "angular": "~1.2.23"
   },
   "devDependencies": {
-    "purescript-math": "*",
-    "purescript-quickcheck": "*"
+    "react": "~0.11.1",
+    "purescript-angular": "purescript-contrib/purescript-angular#master"
   }
 }
