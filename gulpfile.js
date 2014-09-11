@@ -41,8 +41,9 @@ var paths = {
 // https://github.com/purescript-contrib/purescript-free/blob/master/gulpfile.js
 
 var onError = function (err) {
-  gutil.beep();
-  console.log(err.message);
+    gutil.beep();
+    console.log('yoyo');
+    console.log(err.message);
 };
 
 var compile = function(paths, options) {

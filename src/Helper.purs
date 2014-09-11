@@ -1,6 +1,5 @@
 module Helper where
 
-
 import qualified HRec as H
 import qualified Data.Array as A
 import Data.Maybe
@@ -11,6 +10,7 @@ import Data.Monoid (Monoid, mempty)
 -- import Control.Lens hiding ((??))
 import Data.Tuple (Tuple(..))
 import Debug.Trace
+import Data.Foldable (foldr)
 
 columns = ["sales", "name"]
 infixr 9 ..
@@ -31,7 +31,13 @@ calls = {floats: ["sales", "numbers", "other_numbers"],
          columns: ["names", "other_names"]}
 -- x = show toFloat
 
+prefix :: String -> String -> String
 prefix s = ((++) (s ++ "."))
+
+combine :: String -> [(String -> String)] -> [String]
+combine ls fs = A.map f cs
+  where cs = A.concatMap (split " ") .. split "\n" $ ls
+        f s = foldr ($) s fs
 
 newtype Col = Col ColRec
 type ColRec = {floats :: [String], columns :: [String]}
@@ -68,7 +74,8 @@ main = do
     print $ toFloat "database.sales"
     print $ ((++) "S") "database.sales"
     print $ prefix "P" "database.sales"
-    print $ o
+    -- print $ o
+    print $ combine "hello there my pretties" [prefix "S"]
 
     let x = A.map (prefix "S") <$> H.fromList [Tuple "floats" ["sales", "numbers"]]
     trace $ showFooImpl x

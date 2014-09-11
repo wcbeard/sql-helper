@@ -1,19 +1,34 @@
 <!doctype html>
 <html lang="en"
-      ng-app="todomvc"
-      data-framework="angularjs">
-  <head>
-    <meta charset="utf-8">
-    <title>AngularJS • TodoMVC</title>
-
-  </head>
-  <body>
-    <section id="todoapp" ng-controller="TodoCtrl">
+ng-app="todomvc"
+data-framework="angularjs">
+<head>
+  <meta charset="utf-8">
+  <title>AngularJS • TodoMVC</title>
+</head>
+<body>
+  <section id="todoapp" ng-controller="TodoCtrl">
     todo: {{newTodo}}
-   </section>
+  <form>
+    Table: <input type="text" name="firstname" ng-model="tablename" ng-change="trace('hi')"><br>
+    Table: <input type="text" name="firstname" ng-model="tablename" ng-change="showScope('blank')"><br>
+    fieldname: <input type="text" name="firstname" ng-model="fieldname" ng-change="testControllerE({d:fieldname})"><br>
+    fieldnames: <textarea ng-model="fieldnames"></textarea><br>
+  </form>
+    Table: {{tablename}} <br>
+    Cols: {{cols}} <br>
+    <!-- trace: {{trace}} <br> -->
+    <!-- trace: {{trace('hiss')}} <br> -->
+    dinner: {{dinner}} <br>
+    d: {{prefix(tablename)(fieldnames)}} <br>
+    d2: {{combine(fieldnames || '')([prefix(tablename)])}} <br>
+    <!-- dinner: {{testControllerS('s')()}} <br> -->
+    <button ng-click="testControllerS('s')">click</button>
+    <button ng-click="showScope()">show scope</button>
+  </section>
 
-    <script src="bower_components/angular/angular.js"></script>
-    <!-- <script src="dist/index.js"></script> -->
-    <script src="dist/Main.js"></script>
-  </body>
+  <script src="bower_components/angular/angular.js"></script>
+  <!-- <script src="dist/index.js"></script> -->
+  <script src="dist/Main.js"></script>
+</body>
 </html>
