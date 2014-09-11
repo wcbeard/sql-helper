@@ -7,28 +7,31 @@ data-framework="angularjs">
   <title>AngularJS • TodoMVC</title>
 </head>
 <body>
-  <section id="todoapp" ng-controller="TodoCtrl">
-    todo: {{newTodo}}
-  <form>
-    Table: <input type="text" name="firstname" ng-model="tablename" ng-change="trace('hi')"><br>
-    Table: <input type="text" name="firstname" ng-model="tablename" ng-change="showScope('blank')"><br>
-    fieldname: <input type="text" name="firstname" ng-model="fieldname" ng-change="testControllerE({d:fieldname})"><br>
-    fieldnames: <textarea ng-model="fieldnames"></textarea><br>
-  </form>
-    Table: {{tablename}} <br>
-    Cols: {{cols}} <br>
-    <!-- trace: {{trace}} <br> -->
-    <!-- trace: {{trace('hiss')}} <br> -->
-    dinner: {{dinner}} <br>
-    d: {{prefix(tablename)(fieldnames)}} <br>
-    d2: {{combine(fieldnames || '')([prefix(tablename)])}} <br>
-    <!-- dinner: {{testControllerS('s')()}} <br> -->
-    <button ng-click="testControllerS('s')">click</button>
-    <button ng-click="showScope()">show scope</button>
+  <div id="todoapp" ng-controller="TodoCtrl">
+  <section ng-repeat="sel in selects">
+      <form>
+        Table: <input type="text" name="firstname" ng-model="sel.tablename" ng-change="showScope()"><br>
+        fieldnames: <textarea class="cols" ng-model="sel.fieldnames"></textarea><br>
+        <select ng-model="sel.transform" ng-options="f as label for (label, f) in transforms"
+        ng-init="sel.transform=transforms.none">
+      </select>
+    </form>
+    d2: {{combine(sel.fieldnames || '')([sel.transform, prefix(sel.tablename || '')])}} <br>
   </section>
+  <button ng-click="showScope()">show scope</button>
+  <button ng-click="increment(selects)">New row</button> <br>
+  Sel: {{selects}}
 
-  <script src="bower_components/angular/angular.js"></script>
-  <!-- <script src="dist/index.js"></script> -->
-  <script src="dist/Main.js"></script>
+</div>
+
+<script src="bower_components/angular/angular.js"></script>
+<!-- <script src="dist/index.js"></script> -->
+<script src="dist/Main.js"></script>
 </body>
+<style type="text/css">
+  .cols {
+    width: 100px;
+    height: 150px;
+  }
+</style>
 </html>

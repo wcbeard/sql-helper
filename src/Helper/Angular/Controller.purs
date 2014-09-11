@@ -7,8 +7,9 @@ module Todomvc.Controller (todoctrl) where
 -- import Control.Monad (unless, when)
 import Control.Monad.Eff (Eff())
 import qualified Helper as H
-import Helper ((..), prefix, combine)
+import Helper ((..), prefix, combine, toFloat)
 import Debug.Trace (trace)
+import Data.Array (append, snoc)
 
 -- import Control.Monad.ST (ST(), STArray(), newSTArray, runSTArray)
 
@@ -54,7 +55,7 @@ testController' scope a = do
     -- return $ \_ -> (x)
 
 -- b = show testControllerX
--- x = show testController
+-- x = show  id
 controller scope = do
   extendScope {newTodo: "hello?"
               , trace: printer
@@ -64,10 +65,19 @@ controller scope = do
               , testController': unsafeRunEff .. testControllerX scope
               , prefix: prefix
               , combine: combine
-              , showScope: \_ -> printer scope
+              , showScope: (\_ -> printer scope)
+              , transforms: {float: toFloat, none: (\a->a)}
+              , selects: [{}]
+              -- , increment: flip snoc {}
+              -- , increment: snoc {}
+              , increment: increment scope
               } scope
   return $ printer scope
 
+increment scope = modifyScope (\s -> do
+      -- preve <- readScope s
+      return {selects: snoc s.selects {}}
+    ) scope
 
 foreign import todoctrl
   " /*@ngInject*/function todoctrl($scope) { \

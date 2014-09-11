@@ -3,7 +3,7 @@ module Helper where
 import qualified HRec as H
 import qualified Data.Array as A
 import Data.Maybe
-import Data.String (split)
+import Data.String (split, joinWith)
 -- import Control.Lens hiding ((??), (..))
 import qualified Data.Map as M
 import Data.Monoid (Monoid, mempty)
@@ -34,8 +34,8 @@ calls = {floats: ["sales", "numbers", "other_numbers"],
 prefix :: String -> String -> String
 prefix s = ((++) (s ++ "."))
 
-combine :: String -> [(String -> String)] -> [String]
-combine ls fs = A.map f cs
+combine :: String -> [(String -> String)] -> String
+combine ls fs = joinWith ", " $ A.map f cs
   where cs = A.concatMap (split " ") .. split "\n" $ ls
         f s = foldr ($) s fs
 
