@@ -115,7 +115,4 @@ gulp.task('watch-make', function() {
 
 // gulp.task('default', function() {runSequence('make', 'docs')});
 // gulp.task('default', ['clean', 'browser', 'run']);
-gulp.task('default', function() {
-    gulp.watch(paths.src, ['clean', 'run']);
-    // gulp.watch(paths.src, ['clean', 'browser', 'run']);
-});
+gulp.task('default', ['browser']);
